@@ -261,3 +261,11 @@ endif
 
 override __git_no_dirty_call__ = $(shell git status --porcelain)
 override __git_no_dirty_err__ := There are untracked/unstaged/uncommitted changes!
+
+.PHONY: create/binary_dir
+create/binary_dir:
+ifeq ($(__OS__),Windows)
+	@ [void](New-Item "$(BINARY_DIR)" -ItemType Directory -Force)
+else
+	@ mkdir -p "$(BINARY_DIR)"
+endif
