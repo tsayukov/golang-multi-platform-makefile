@@ -372,3 +372,12 @@ vet:
 	@ $(call __ok__,$(__vet_log__) - done)
 
 override __vet_log__ := Running go vet
+
+## golangci-lint: a fast linters runner for Go
+.PHONY: golangci-lint
+golangci-lint:
+	@ $(call __go__,$(__golangci_lint_log__)...)
+	@ golangci-lint run ./...
+	@ $(call __ok__,$(__golangci_lint_log__) - done)
+
+override __golangci_lint_log__ := Running golangci-lint
