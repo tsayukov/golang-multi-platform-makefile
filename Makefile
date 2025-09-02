@@ -305,3 +305,13 @@ override __clean_log__ := Cleaning $(BINARY_DIR)
 ##:                              Quality control
 ##:
 # ============================================================================ #
+
+## mod/tidy-diff: check missing and unused modules without modifying
+##              : the `go.mod` and `go.sum` files
+.PHONY: mod/tidy-diff
+mod/tidy-diff:
+	@ $(call __go__,$(__mod_tidy_diff_log__)...)
+	@ go mod tidy -diff
+	@ $(call __ok__,$(__mod_tidy_diff_log__) - done)
+
+override __mod_tidy_diff_log__ := Checking missing and unused modules
