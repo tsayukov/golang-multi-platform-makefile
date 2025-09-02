@@ -354,3 +354,12 @@ endif
 
 override __fmt_no_dirty_call__ = $(shell gofmt -l .)
 override __fmt_no_dirty_log__ := Checking unformatted package sources
+
+## fmt: gofmt (reformat) package sources
+.PHONY: fmt
+fmt:
+	@ $(call __go__,$(__fmt_log__)...)
+	@ go fmt ./...
+	@ $(call __ok__,$(__fmt_log__) - done)
+
+override __fmt_log__ := Reformatting package sources
