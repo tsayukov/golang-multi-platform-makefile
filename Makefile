@@ -243,3 +243,21 @@ endif
 
 override __confirm_greetings__ := Are you sure? [y/N]
 override __confirm_err__       := The choice is not confirmed. Abort!
+
+.PHONY: git/no-dirty
+git/no-dirty:
+ifeq ($(__OS__),Windows)
+	@ if (![string]::IsNullOrEmpty("$(__git_no_dirty_call__)")) { <#\
+ #>     $(call __err__,$(__git_no_dirty_err__)); <#\
+ #>     exit 1 <#\
+ #> }
+else
+	@ test -z "$(__git_no_dirty_call__)" \
+	|| (\
+        $(call __err__,$(__git_no_dirty_err__)) \
+        && exit 1 \
+    )
+endif
+
+override __git_no_dirty_call__ = $(shell git status --porcelain)
+override __git_no_dirty_err__ := There are untracked/unstaged/uncommitted changes!
