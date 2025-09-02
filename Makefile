@@ -275,3 +275,12 @@ endif
 ##:                                   Build
 ##:
 # ============================================================================ #
+
+## mod/download: download modules to local cache
+.PHONY: mod/download
+mod/download:
+	@ $(call __go__,$(__mod_download_log__)...)
+	@ go mod download -x
+	@ $(call __ok__,$(__mod_download_log__) - done)
+
+override __mod_download_log__ := Downloading modules to local cache
