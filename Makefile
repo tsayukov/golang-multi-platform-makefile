@@ -285,6 +285,25 @@ mod/download:
 
 override __mod_download_log__ := Downloading modules to local cache
 
+## mod/tidy-diff: check missing and unused modules without modifying
+##              : the `go.mod` and `go.sum` files
+.PHONY: mod/tidy-diff
+mod/tidy-diff:
+	@ $(call __go__,$(__mod_tidy_diff_log__)...)
+	@ go mod tidy -diff
+	@ $(call __ok__,$(__mod_tidy_diff_log__) - done)
+
+override __mod_tidy_diff_log__ := Checking missing and unused modules
+
+## mod/tidy: add missing and remove unused modules
+.PHONY: mod/tidy
+mod/tidy:
+	@ $(call __go__,$(__mod_tidy_log__)...)
+	@ go mod tidy -v
+	@ $(call __ok__,$(__mod_tidy_log__) - done)
+
+override __mod_tidy_log__ := Adding missing and remove unused modules
+
 ## clean: remove files from the binary directory
 .PHONY: clean
 clean:
@@ -305,25 +324,6 @@ override __clean_log__ := Cleaning $(BINARY_DIR)
 ##:                              Quality control
 ##:
 # ============================================================================ #
-
-## mod/tidy-diff: check missing and unused modules without modifying
-##              : the `go.mod` and `go.sum` files
-.PHONY: mod/tidy-diff
-mod/tidy-diff:
-	@ $(call __go__,$(__mod_tidy_diff_log__)...)
-	@ go mod tidy -diff
-	@ $(call __ok__,$(__mod_tidy_diff_log__) - done)
-
-override __mod_tidy_diff_log__ := Checking missing and unused modules
-
-## mod/tidy: add missing and remove unused modules
-.PHONY: mod/tidy
-mod/tidy:
-	@ $(call __go__,$(__mod_tidy_log__)...)
-	@ go mod tidy -v
-	@ $(call __ok__,$(__mod_tidy_log__) - done)
-
-override __mod_tidy_log__ := Adding missing and remove unused modules
 
 ## mod/verify: verify that dependencies have expected content
 .PHONY: mod/verify
