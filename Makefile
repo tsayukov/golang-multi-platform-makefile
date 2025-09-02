@@ -363,3 +363,12 @@ fmt:
 	@ $(call __ok__,$(__fmt_log__) - done)
 
 override __fmt_log__ := Reformatting package sources
+
+## vet: report likely mistakes in packages
+.PHONY: vet
+vet:
+	@ $(call __go__,$(__vet_log__)...)
+	@ go vet ./...
+	@ $(call __ok__,$(__vet_log__) - done)
+
+override __vet_log__ := Running go vet
