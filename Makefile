@@ -324,3 +324,12 @@ mod/tidy:
 	@ $(call __ok__,$(__mod_tidy_log__) - done)
 
 override __mod_tidy_log__ := Adding missing and remove unused modules
+
+## mod/verify: verify that dependencies have expected content
+.PHONY: mod/verify
+mod/verify:
+	@ $(call __go__,$(__mod_verify_log__)...)
+	@ go mod verify
+	@ $(call __ok__,$(__mod_verify_log__) - done)
+
+override __mod_verify_log__ := Verifying dependencies
