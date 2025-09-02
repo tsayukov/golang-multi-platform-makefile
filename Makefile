@@ -333,3 +333,24 @@ mod/verify:
 	@ $(call __ok__,$(__mod_verify_log__) - done)
 
 override __mod_verify_log__ := Verifying dependencies
+
+## fmt/no-dirty: check package sources whose formatting differs from gofmt
+.PHONY: fmt/no-dirty
+fmt/no-dirty:
+	@ $(call __go__,$(__fmt_no_dirty_log__)...)
+ifeq ($(__OS__),Windows)
+	@ if (![string]::IsNullOrEmpty("$(__fmt_no_dirty_call__)") { <#\
+ #>     $(call __err__,$(__fmt_no_dirty_log__) - found); <#\
+ #>     exit 1 <#\
+ #> }
+else
+	@ test -z "$(__fmt_no_dirty_call__)" \
+    || (\
+        $(call __err__,$(__fmt_no_dirty_log__) - found) \
+        && exit 1 \
+    )
+endif
+	@ $(call __ok__,$(__fmt_no_dirty_log__) - done)
+
+override __fmt_no_dirty_call__ = $(shell gofmt -l .)
+override __fmt_no_dirty_log__ := Checking unformatted package sources
