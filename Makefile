@@ -265,22 +265,7 @@ endif
 
 .PHONY: confirm
 confirm:
-ifeq ($(__OS__),Windows)
-	@ if ((Read-Host -Prompt "$(__confirm_greetings__)") -cne "y") { <#\
- #>     $(call __err__,$(__confirm_err__)); <#\
- #>     exit 1 <#\
- #> }
-else
-	@ read -r -p '$(__confirm_greetings__) ' answer \
-    && [ $${answer:-N} = 'y' ] \
-    || (\
-        $(call __err__,$(__confirm_err__)) \
-        && exit 1 \
-    )
-endif
-
-override __confirm_greetings__ := Are you sure? [y/N]
-override __confirm_err__       := The choice is not confirmed. Abort!
+	@ $(call __choice_or_err__,Are you sure?,y,N,The choice is not confirmed. Abort!)
 
 .PHONY: git/no-dirty
 git/no-dirty:
