@@ -371,11 +371,9 @@ fmt/no-dirty:
 ## fmt: gofmt (reformat) package sources
 .PHONY: fmt
 fmt:
-	@ $(call __go__,$(__fmt_log__)...)
-	@ go fmt ./...
-	@ $(call __ok__,$(__fmt_log__) - done)
-
-override __fmt_log__ := Reformatting package sources
+	@ $(call __run_with_logging__,Reformatting package sources,\
+        go fmt ./... \
+    )
 
 ## vet: report likely mistakes in packages
 .PHONY: vet
