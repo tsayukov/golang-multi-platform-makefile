@@ -187,27 +187,27 @@ endif
 #
 # To generate a target that prints the value of a variable, use the list below
 # and append it with the variable name:
-#   __variables__ += <variable name>
+#   override __variables__ += <variable name>
     override __variables__ :=
 # ============================================================================ #
 
 ## BINARY_DIR: get the directory with binaries
 BINARY_DIR := bin
-__variables__ += BINARY_DIR
+override __variables__ += BINARY_DIR
 
 ## GOBIN: get the absolute path where the `go install` command installs binaries;
 ##      : GOBIN will be exported to child processes and prepended to PATH
 export GOBIN ?= $(__PROJECT_ROOT__)$(BINARY_DIR)
 export PATH  := $(GOBIN)$(__LIST_SEP__)$(PATH)
-__variables__ += GOBIN
+override __variables__ += GOBIN
 
 ## TARGET_OS: get the target's operation system
 TARGET_OS := linux
-__variables__ += TARGET_OS
+override __variables__ += TARGET_OS
 
 ## TARGET_ARCH: get the target's architecture
 TARGET_ARCH := amd64
-__variables__ += TARGET_ARCH
+override __variables__ += TARGET_ARCH
 
 # Generate variable getters for all the variables in the last __variables__.
 define __make_variable_getter__
