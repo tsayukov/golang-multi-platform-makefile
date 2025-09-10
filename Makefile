@@ -269,21 +269,7 @@ confirm:
 
 .PHONY: git/no-dirty
 git/no-dirty:
-ifeq ($(__OS__),Windows)
-	@ if (![string]::IsNullOrEmpty("$(__git_no_dirty_call__)")) { <#\
- #>     $(call __err__,$(__git_no_dirty_err__)); <#\
- #>     exit 1 <#\
- #> }
-else
-	@ test -z "$(__git_no_dirty_call__)" \
-	|| (\
-        $(call __err__,$(__git_no_dirty_err__)) \
-        && exit 1 \
-    )
-endif
-
-override __git_no_dirty_call__ = $(shell git status --porcelain)
-override __git_no_dirty_err__ := There are untracked/unstaged/uncommitted changes!
+	@ $(call __empty_or_err__,git status --porcelain,There are untracked/unstaged/uncommitted changes!)
 
 .PHONY: create/binary_dir
 create/binary_dir:
