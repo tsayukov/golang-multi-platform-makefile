@@ -324,11 +324,9 @@ mod/download:
 ##              : the `go.mod` and `go.sum` files
 .PHONY: mod/tidy-diff
 mod/tidy-diff:
-	@ $(call __go__,$(__mod_tidy_diff_log__)...)
-	@ go mod tidy -diff
-	@ $(call __ok__,$(__mod_tidy_diff_log__) - done)
-
-override __mod_tidy_diff_log__ := Checking missing and unused modules
+	@ $(call __run_with_logging__,Checking missing and unused modules,\
+        go mod tidy -diff \
+    )
 
 ## mod/tidy: add missing and remove unused modules
 .PHONY: mod/tidy
