@@ -146,6 +146,32 @@
     override __ok__   = $(call __color_text__,$(__GREEN__),v ) && echo "$1"
     override __warn__ = $(call __color_text__,$(__YELLOW__),!! ) && echo "$1"
     override __err__  = $(call __color_text__,$(__RED__),x ) && echo "$1"
+#
+# 3. Logging:
+#
+#   .PHONY: do
+#   do:
+#   	@ $(call __run_with_logging__,Do something,\
+#           echo "The did is done" \
+#       )
+#
+    ifeq ($(__OS__),Windows)
+        override __run_with_logging__ = \
+            $(call __go__,$1...); $2; if ($$?) { \
+                $(call __ok__,$1 - done) \
+            } else { \
+                $(call __err__,$1 - failed); \
+                exit 1 \
+            }
+    else
+        override __run_with_logging__ = \
+            $(call __go__,$1...); \
+            $2; if [ $$? = 0 ]; \
+            then $(call __ok__,$1 - done); \
+	        else $(call __err__,$1 - failed) \
+	             && exit 1; \
+	        fi
+    endif
 # ============================================================================ #
 
 # The blank line below is necessary to get the same help message on different
