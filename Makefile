@@ -185,10 +185,17 @@ endif
 # or by passing them into the `make` call:
 #   make <variable_1>=<value_1> <variable_2>=<value_2> [...]
 #
-# To generate a target that prints the value of a variable, use the list below
-# and append it with the variable name:
+# To generate a target that prints the value of a variable by default,
+# use the list below and append it with the variable name:
 #   override __variables__ += <variable name>
     override __variables__ :=
+#
+# If necessary, change the template below.
+define __make_variable_getter__
+.PHONY: $1
+$1:
+	@ echo "$($1)"
+endef
 # ============================================================================ #
 
 ## BINARY_DIR: get the directory with binaries
@@ -210,11 +217,6 @@ TARGET_ARCH := amd64
 override __variables__ += TARGET_ARCH
 
 # Generate variable getters for all the variables in the last __variables__.
-define __make_variable_getter__
-.PHONY: $1
-$1:
-	@ echo "$($1)"
-endef
 $(foreach var,$(__variables__), \
     $(eval \
         $(call __make_variable_getter__,$(var)) \
