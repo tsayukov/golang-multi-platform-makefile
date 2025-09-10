@@ -316,11 +316,9 @@ endif
 ## mod/download: download modules to local cache
 .PHONY: mod/download
 mod/download:
-	@ $(call __go__,$(__mod_download_log__)...)
-	@ go mod download -x
-	@ $(call __ok__,$(__mod_download_log__) - done)
-
-override __mod_download_log__ := Downloading modules to local cache
+	@ $(call __run_with_logging__,Downloading modules to local cache,\
+        go mod download -x \
+    )
 
 ## mod/tidy-diff: check missing and unused modules without modifying
 ##              : the `go.mod` and `go.sum` files
