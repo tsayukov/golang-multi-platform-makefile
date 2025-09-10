@@ -378,11 +378,9 @@ fmt:
 ## vet: report likely mistakes in packages
 .PHONY: vet
 vet:
-	@ $(call __go__,$(__vet_log__)...)
-	@ go vet ./...
-	@ $(call __ok__,$(__vet_log__) - done)
-
-override __vet_log__ := Running go vet
+	@ $(call __run_with_logging__,Running go vet,\
+        go vet ./... \
+    )
 
 ## golangci-lint: a fast linters runner for Go
 .PHONY: golangci-lint
