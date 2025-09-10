@@ -331,11 +331,9 @@ mod/tidy-diff:
 ## mod/tidy: add missing and remove unused modules
 .PHONY: mod/tidy
 mod/tidy:
-	@ $(call __go__,$(__mod_tidy_log__)...)
-	@ go mod tidy -v
-	@ $(call __ok__,$(__mod_tidy_log__) - done)
-
-override __mod_tidy_log__ := Adding missing and remove unused modules
+	@ $(call __run_with_logging__,Adding missing and remove unused modules,\
+        go mod tidy -v \
+    )
 
 ## clean: remove files from the binary directory
 .PHONY: clean
