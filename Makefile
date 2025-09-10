@@ -225,6 +225,26 @@ $(foreach var,$(__variables__), \
 #                                    Helpers
 # ============================================================================ #
 
+# __choice_or_err__ prompts the user to choose between two options:
+# the second one always terminates the 'make' execution with the given error.
+#  $1: a prompt prefix
+#  $2: a first option
+#  $3: a second option
+#  $4: a error message
+ifeq ($(__OS__),Windows)
+    override __choice_or_err__ = \
+        if ((Read-Host -Prompt "$1 [$2/$3]") -cne "$2") { \
+            $(call __err__,$4); \
+            exit 1 \
+        }
+else
+	override __choice_or_err__ = \
+	    read -r -p '$1 [$2/$3] ' answer && [ $${answer:-$3} = '$2' ] || ( \
+            $(call __err__,$4) \
+            && exit 1 \
+        )
+endif
+
 .PHONY: confirm
 confirm:
 ifeq ($(__OS__),Windows)
