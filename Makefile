@@ -338,17 +338,18 @@ mod/tidy:
 ## clean: remove files from the binary directory
 .PHONY: clean
 clean:
-	@ $(call __go__,$(__clean_log__)...)
-ifeq ($(__OS__),Windows)
-	@ if (Test-Path "$(BINARY_DIR)" -PathType Container) { <#\
- #>     Remove-Item "$(BINARY_DIR)\*" -Recurse -Force <#\
- #> }
-else
-	@ rm -rf $(BINARY_DIR)/*
-endif
-	@ $(call __ok__,$(__clean_log__) - done)
+	@ $(call __run_with_logging__,Cleaning $(BINARY_DIR),\
+        $(call __clean_impl__) \
+    )
 
-override __clean_log__ := Cleaning $(BINARY_DIR)
+ifeq ($(__OS__),Windows)
+    override __clean_impl__ = \
+        if (Test-Path "$(BINARY_DIR)" -PathType Container) { \
+            Remove-Item "$(BINARY_DIR)\*" -Recurse -Force \
+        }
+else
+    override __clean_impl__ = rm -rf $(BINARY_DIR)/*
+endif
 
 # ============================================================================ #
 ##:
