@@ -245,6 +245,24 @@ else
         )
 endif
 
+# __empty_or_err__ runs the given command and terminates the 'make' execution
+# with the given error if the command output is not empty.
+#  $1: a command
+#  $2: a error message
+ifeq ($(__OS__),Windows)
+    override __empty_or_err__ = \
+        if (![string]::IsNullOrEmpty("$(shell $1)")) { \
+            $(call __err__,$2); \
+            exit 1 \
+        }
+else
+    override __empty_or_err__ = \
+        test -z '$(shell $1)' || ( \
+            $(call __err__,$2) \
+            && exit 1 \
+        )
+endif
+
 .PHONY: confirm
 confirm:
 ifeq ($(__OS__),Windows)
