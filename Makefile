@@ -359,11 +359,9 @@ override __clean_log__ := Cleaning $(BINARY_DIR)
 ## mod/verify: verify that dependencies have expected content
 .PHONY: mod/verify
 mod/verify:
-	@ $(call __go__,$(__mod_verify_log__)...)
-	@ go mod verify
-	@ $(call __ok__,$(__mod_verify_log__) - done)
-
-override __mod_verify_log__ := Verifying dependencies
+	@ $(call __run_with_logging__,Verifying dependencies,\
+        go mod verify \
+    )
 
 ## fmt/no-dirty: check package sources whose formatting differs from gofmt
 .PHONY: fmt/no-dirty
