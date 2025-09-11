@@ -186,17 +186,17 @@ help:
 	@ $(info :: SHELL: $(SHELL))
 	@ $(info )
 ifeq ($(__OS__),Windows)
-	@ Write-Host "Targets:" -NoNewline
     # Hack: replace two '#' with the NULL character to force ConvertFrom-Csv
     # to print empty lines.
-	@ (Get-Content $(MAKEFILE_LIST)) -match "^##" -replace "^##","$$([char]0x0)" <#\
+	@ Write-Host "Targets:" -NoNewline; <#\
+ #> (Get-Content $(MAKEFILE_LIST)) -match "^##" -replace "^##","$$([char]0x0)" <#\
  #> | ConvertFrom-Csv -Delimiter ":" -Header Target,Description <#\
  #> | Format-Table <#\
  #>     -AutoSize -HideTableHeaders <#\
  #>     -Property @{Expression=" "},Target,@{Expression=" "},Description
 else
-	@ echo 'Targets:'
-	@ sed --quiet 's/^##//p' $(MAKEFILE_LIST) \
+	@ echo 'Targets:' \
+	&& sed --quiet 's/^##//p' $(MAKEFILE_LIST) \
 	| sed --expression='s/[ \t]*:[ \t]*/:/' \
     | column --table --separator ':' \
     | sed --expression='s/^/ /' \
