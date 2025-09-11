@@ -275,18 +275,18 @@ endif
 
 # __empty_or_err__ runs the given command and terminates the 'make' execution
 # with the given error if the command output is not empty.
-#  $1: a command
-#  $2: a error message
+#  $1: a error message
+#  $2: a command to check
 ifeq ($(__OS__),Windows)
     override __empty_or_err__ = \
-        if (![string]::IsNullOrEmpty("$(shell $1)")) { \
-            $(call __err__,$2); \
+        if (![string]::IsNullOrEmpty("$(shell $2)")) { \
+            $(call __err__,$1); \
             exit 1 \
         }
 else
     override __empty_or_err__ = \
-        test -z '$(shell $1)' || ( \
-            $(call __err__,$2) \
+        test -z '$(shell $2)' || ( \
+            $(call __err__,$1) \
             && exit 1 \
         )
 endif
@@ -297,7 +297,9 @@ confirm:
 
 .PHONY: git/no-dirty
 git/no-dirty:
-	@ $(call __empty_or_err__,git status --porcelain,There are untracked/unstaged/uncommitted changes!)
+	@ $(call __empty_or_err__,There are untracked/unstaged/uncommitted changes!,\
+        git status --porcelain \
+    )
 
 .PHONY: create/binary_dir
 create/binary_dir:
@@ -367,7 +369,9 @@ mod/verify:
 ## fmt/no-dirty: check package sources whose formatting differs from gofmt
 .PHONY: fmt/no-dirty
 fmt/no-dirty:
-	@ $(call __empty_or_err__,gofmt -d .,Package sources is unformatted)
+	@ $(call __empty_or_err__,Package sources is unformatted,\
+        gofmt -d . \
+    )
 
 ## fmt: gofmt (reformat) package sources
 .PHONY: fmt
