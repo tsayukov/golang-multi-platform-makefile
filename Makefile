@@ -172,6 +172,18 @@
 	             && exit 1; \
 	        fi
     endif
+#
+# 4. There are convenient definitions of the comma and space variables:
+#
+    override __comma__ := ,
+    override __empty__ :=
+    override __space__ := $(__empty__) $(__empty__)
+#
+# They can be used to replace space-separated words with comma-separated words,
+# i.e., to pass them into a PowerShell command:
+#
+    override __space_sep_to_comma_sep_list__ = $(subst $(__space__),$(__comma__),$(strip $1))
+#
 # ============================================================================ #
 
 # The blank line below is necessary to get the same help message on different
