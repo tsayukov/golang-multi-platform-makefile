@@ -201,7 +201,8 @@ ifeq ($(__OS__),Windows)
     # Hack: replace two '#' with the NULL character to force ConvertFrom-Csv
     # to print empty lines.
 	@ Write-Host "Targets:" -NoNewline; <#\
- #> (Get-Content $(MAKEFILE_LIST)) -match "^##" -replace "^##","$$([char]0x0)" <#\
+ #> (Get-Content $(call __space_sep_to_comma_sep_list__,$(MAKEFILE_LIST))) <#\
+ #>     -match "^##" -replace "^##","$$([char]0x0)" <#\
  #> | ConvertFrom-Csv -Delimiter ":" -Header Target,Description <#\
  #> | Format-Table <#\
  #>     -AutoSize -HideTableHeaders <#\
