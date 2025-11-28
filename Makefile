@@ -111,7 +111,9 @@
     endif
 #
 # The project root containing the Makefile as an absolute path.
-    override __PROJECT_ROOT__ := $(subst /,$(__PATH_SEP__),$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+# NOTE: the first word of MAKEFILE_LIST should be used in cases where
+# a top-level Makefile includes this file.
+    override __PROJECT_ROOT__ := $(subst /,$(__PATH_SEP__),$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 #
 #                                     TIPS
 #
