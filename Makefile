@@ -28,6 +28,26 @@
 #  - https://www.alexedwards.net/blog/a-time-saving-makefile-for-your-go-projects
 #  - https://gist.github.com/alexedwards/3b40775846535d0014ab1ff477e4a568
 #
+#                                  HOW TO USE
+#
+# The simplest way is to copying the Makefile into your project and to modify it
+# according to your needs.
+#
+# The more extensible way is to create a subtree by importing its content from
+# the repository, e.g.:
+#
+#   git subtree --squash -P scripts/make add git@github.com:tsayukov/golang-multi-platform-makefile.git main
+#
+# that creates the scripts/make directory and put the Makefile into it. Then you
+# can include the Makefile in your top-level Makefile:
+#
+#   include scripts/make/Makefile
+#
+# Getting updates can be done using the command (if the working tree
+# has no modification!):
+#
+#   git subtree --squash -P scripts/make pull git@github.com:tsayukov/golang-multi-platform-makefile.git main
+#
 #                    HOW TO WRITE DOCUMENTATION FOR TARGETS
 #
 # Every comment line that starts with two '#' is parsed by the 'help' target
