@@ -264,7 +264,7 @@ endif
     override gmVariables :=
 #
 # If necessary, change the template below.
-define gmMakeVariableGetter
+override define gmMakeVariableGetter
 .PHONY: $1
 $1:
 	@ echo "$($1)"
