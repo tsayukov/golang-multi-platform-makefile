@@ -68,9 +68,9 @@
 #
 # 1. Check whether the environment variable PATH contains the path separator:
 #  - in Windows:
-    override __semicolon__ := ;
+    override gmSemicolon := ;
 #  - in a Unix-like operating system:
-    override __colon__     := :
+    override gmColon     := :
 # Unlikely, but the PATH might contain only one element or a path with
 # a semicolon in a Unix-like operating system. It can also be passed
 # via the command line to prepend it with the specific user path.
@@ -79,10 +79,10 @@
 # on the Windows NT family. However, the OS variable can be overwritten.
 #
 # 3. Call the `uname` command to get the name of the current operating system.
-    override __sh_uname_or_unknown__ := sh -c 'uname 2>/dev/null || echo Unknown'
+    override gmUnameOrUnknown := sh -c 'uname 2>/dev/null || echo Unknown'
 # Transform the Cygwin/MSYS verbose output of `uname` to 'Cygwin'/'MSYS'.
 # See: https://stackoverflow.com/a/52062069/10537247
-    override __shorten_os_name__ = \
+    override gmShortenOSName = \
         $(patsubst CYGWIN%,Cygwin,\
             $(patsubst MSYS%,MSYS,\
                 $(patsubst MINGW%,MSYS,\
@@ -97,19 +97,19 @@
 #   make OS=<operating system name> [...]
 #
     ifeq ($(origin OS),command line)
-        override __OS__ := $(OS)
+        override gmOS := $(OS)
     else ifeq ($(OS),Windows_NT)
         # Distinguish between native Windows and Cygwin/MSYS.
-        ifneq (,$(findstring $(__semicolon__),$(PATH))) # if semicolon is in PATH
-            override __OS__ := Windows
+        ifneq (,$(findstring $(gmSemicolon),$(PATH))) # if semicolon is in PATH
+            override gmOS := Windows
         else
-            override __OS__ := $(call __shorten_os_name__,$(shell $(__sh_uname_or_unknown__)))
+            override gmOS := $(call gmShortenOSName,$(shell $(gmUnameOrUnknown)))
         endif
     else
-        override __OS__ := $(shell $(__sh_uname_or_unknown__))
+        override gmOS := $(shell $(gmUnameOrUnknown))
     endif
 #
-# Use the __OS__ variable to match the detected operating system against
+# Use the gmOS variable to match the detected operating system against
 # Windows, Linux, Darwin, etc.
 #
 #                                 CONFIGURATION
@@ -118,22 +118,22 @@
     .DEFAULT_GOAL := help
 #
 # Choosing the appropriate shell, path separator, and list separator.
-    ifeq ($(__OS__),Unknown)
+    ifeq ($(gmOS),Unknown)
         $(error unknown operating system)
-    else ifeq ($(__OS__),Windows)
+    else ifeq ($(gmOS),Windows)
         SHELL := pwsh.exe
-        override __PATH_SEP__ := \\
-        override __LIST_SEP__ := $(__semicolon__)
+        override gmPathSep := \\
+        override gmListSep := $(gmSemicolon)
     else
         SHELL := /bin/sh
-        override __PATH_SEP__ := /
-        override __LIST_SEP__ := $(__colon__)
+        override gmPathSep := /
+        override gmListSep := $(gmColon)
     endif
 #
 # The project root containing the Makefile as an absolute path.
 # NOTE: the first word of MAKEFILE_LIST should be used in cases where
 # a top-level Makefile includes this file.
-    override __PROJECT_ROOT__ := $(subst /,$(__PATH_SEP__),$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
+    override gmProjectRoot := $(subst /,$(gmPathSep),$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 #
 #                                     TIPS
 #
@@ -145,66 +145,66 @@
 # 2. Colorful output:
 #   .PHONY: target
 #   target:
-#   	@ $(call __go__,Running $@...)
-#   	@ $(call __ok__,Running $@ - done)
-#   	@ $(call __warn__,Running $@ - warning)
-#   	@ $(call __err__,Running $@ - failed)
+#   	@ $(call gmGo,Running $@...)
+#   	@ $(call gmOK,Running $@ - done)
+#   	@ $(call gmWarn,Running $@ - warning)
+#   	@ $(call gmErr,Running $@ - failed)
 #
-    ifeq ($(__OS__),Windows)
-        override __RED__    := Red
-        override __GREEN__  := Green
-        override __BLUE__   := Blue
-        override __YELLOW__ := Yellow
-        override __color_text__ = Write-Host "$2" -ForegroundColor $1 -NoNewline
+    ifeq ($(gmOS),Windows)
+        override gmRed    := Red
+        override gmGreen  := Green
+        override gmBlue   := Blue
+        override gmYellow := Yellow
+        override gmColorText = Write-Host "$2" -ForegroundColor $1 -NoNewline
     else
-        override __RED__    := \\033[0;31m
-        override __GREEN__  := \\033[0;32m
-        override __BLUE__   := \\033[0;34m
-        override __YELLOW__ := \\033[1;33m
-        override __color_text__ = printf "%b%s%b" "$1" "$2" "\033[0m"
+        override gmRed    := \\033[0;31m
+        override gmGreen  := \\033[0;32m
+        override gmBlue   := \\033[0;34m
+        override gmYellow := \\033[1;33m
+        override gmColorText = printf "%b%s%b" "$1" "$2" "\033[0m"
     endif
 
-    override __go__   = $(call __color_text__,$(__BLUE__),> ) && echo "$1"
-    override __ok__   = $(call __color_text__,$(__GREEN__),v ) && echo "$1"
-    override __warn__ = $(call __color_text__,$(__YELLOW__),!! ) && echo "$1"
-    override __err__  = $(call __color_text__,$(__RED__),x ) && echo "$1"
+    override gmGo   = $(call gmColorText,$(gmBlue),> ) && echo "$1"
+    override gmOK   = $(call gmColorText,$(gmGreen),v ) && echo "$1"
+    override gmWarn = $(call gmColorText,$(gmYellow),!! ) && echo "$1"
+    override gmErr  = $(call gmColorText,$(gmRed),x ) && echo "$1"
 #
 # 3. Logging:
 #
 #   .PHONY: do
 #   do:
-#   	@ $(call __run_with_logging__,Do something,\
+#   	@ $(call gmRun,Do something,\
 #           echo "The did is done" \
 #       )
 #
-    ifeq ($(__OS__),Windows)
-        override __run_with_logging__ = \
-            $(call __go__,$1...); $2; if ($$?) { \
-                $(call __ok__,$1 - done) \
+    ifeq ($(gmOS),Windows)
+        override gmRun = \
+            $(call gmGo,$1...); $2; if ($$?) { \
+                $(call gmOK,$1 - done) \
             } else { \
-                $(call __err__,$1 - failed); \
+                $(call gmErr,$1 - failed); \
                 exit 1 \
             }
     else
-        override __run_with_logging__ = \
-            $(call __go__,$1...); \
+        override gmRun = \
+            $(call gmGo,$1...); \
             $2; if [ $$? = 0 ]; \
-            then $(call __ok__,$1 - done); \
-	        else $(call __err__,$1 - failed) \
+            then $(call gmOK,$1 - done); \
+	        else $(call gmErr,$1 - failed) \
 	             && exit 1; \
 	        fi
     endif
 #
 # 4. There are convenient definitions of the comma and space variables:
 #
-    override __comma__ := ,
-    override __empty__ :=
-    override __space__ := $(__empty__) $(__empty__)
+    override gmComma := ,
+    override gmEmpty :=
+    override gmSpace := $(gmEmpty) $(gmEmpty)
 #
 # They can be used to replace space-separated words with comma-separated words,
 # i.e., to pass them into a PowerShell command:
 #
-    override __space_sep_to_comma_sep_list__ = $(subst $(__space__),$(__comma__),$(strip $1))
+    override gmSpaceSepToCommaSepList = $(subst $(gmSpace),$(gmComma),$(strip $1))
 #
 # ============================================================================ #
 
@@ -216,14 +216,14 @@
 help:
 	@ $(info )
 	@ $(info :: Go Makefile)
-	@ $(info :: OS: $(__OS__))
+	@ $(info :: OS: $(gmOS))
 	@ $(info :: SHELL: $(SHELL))
 	@ $(info )
-ifeq ($(__OS__),Windows)
+ifeq ($(gmOS),Windows)
     # Hack: replace two '#' with the NULL character to force ConvertFrom-Csv
     # to print empty lines.
 	@ Write-Host "Targets:" -NoNewline; <#\
- #> (Get-Content $(call __space_sep_to_comma_sep_list__,$(MAKEFILE_LIST))) <#\
+ #> (Get-Content $(call gmSpaceSepToCommaSepList,$(MAKEFILE_LIST))) <#\
  #>     -match "^##" -replace "^##","$$([char]0x0)" <#\
  #> | ConvertFrom-Csv -Delimiter ":" -Header Target,Description <#\
  #> | Format-Table <#\
@@ -248,11 +248,11 @@ endif
 #
 # To generate a target that prints the value of a variable by default,
 # use the list below and append it with the variable name:
-#   override __variables__ += <variable name>
-    override __variables__ :=
+#   override gmVariables += <variable name>
+    override gmVariables :=
 #
 # If necessary, change the template below.
-define __make_variable_getter__
+define gmMakeVariableGetter
 .PHONY: $1
 $1:
 	@ echo "$($1)"
@@ -261,26 +261,26 @@ endef
 
 ## BINARY_DIR: get the directory with binaries
 BINARY_DIR := bin
-override __variables__ += BINARY_DIR
+override gmVariables += BINARY_DIR
 
 ## GOBIN: get the absolute path where the `go install` command installs binaries;
 ##      : GOBIN will be exported to child processes and prepended to PATH
-export GOBIN ?= $(__PROJECT_ROOT__)$(BINARY_DIR)
-export PATH  := $(GOBIN)$(__LIST_SEP__)$(PATH)
-override __variables__ += GOBIN
+export GOBIN ?= $(gmProjectRoot)$(BINARY_DIR)
+export PATH  := $(GOBIN)$(gmListSep)$(PATH)
+override gmVariables += GOBIN
 
 ## TARGET_OS: get the target's operation system
 TARGET_OS := linux
-override __variables__ += TARGET_OS
+override gmVariables += TARGET_OS
 
 ## TARGET_ARCH: get the target's architecture
 TARGET_ARCH := amd64
-override __variables__ += TARGET_ARCH
+override gmVariables += TARGET_ARCH
 
-# Generate variable getters for all the variables in the last __variables__.
-$(foreach var,$(__variables__), \
+# Generate variable getters for all the variables in the last gmVariables.
+$(foreach var,$(gmVariables), \
     $(eval \
-        $(call __make_variable_getter__,$(var)) \
+        $(call gmMakeVariableGetter,$(var)) \
     ) \
 )
 
@@ -288,57 +288,57 @@ $(foreach var,$(__variables__), \
 #                                    Helpers
 # ============================================================================ #
 
-# __choice_or_err__ prompts the user to choose between two options:
+# gmChoiceOrErr prompts the user to choose between two options:
 # the second one always terminates the 'make' execution with the given error.
 #  $1: a prompt prefix
 #  $2: a first option
 #  $3: a second option
 #  $4: a error message
-ifeq ($(__OS__),Windows)
-    override __choice_or_err__ = \
+ifeq ($(gmOS),Windows)
+    override gmChoiceOrErr = \
         if ((Read-Host -Prompt "$1 [$2/$3]") -cne "$2") { \
-            $(call __err__,$4); \
+            $(call gmErr,$4); \
             exit 1 \
         }
 else
-	override __choice_or_err__ = \
+	override gmChoiceOrErr = \
 	    read -r -p '$1 [$2/$3] ' answer && [ $${answer:-$3} = '$2' ] || ( \
-            $(call __err__,$4) \
+            $(call gmErr,$4) \
             && exit 1 \
         )
 endif
 
-# __empty_or_err__ runs the given command and terminates the 'make' execution
+# gmEmptyOrErr runs the given command and terminates the 'make' execution
 # with the given error if the command output is not empty.
 #  $1: a error message
 #  $2: a command to check
-ifeq ($(__OS__),Windows)
-    override __empty_or_err__ = \
+ifeq ($(gmOS),Windows)
+    override gmEmptyOrErr = \
         if (![string]::IsNullOrEmpty("$(shell $2)")) { \
-            $(call __err__,$1); \
+            $(call gmErr,$1); \
             exit 1 \
         }
 else
-    override __empty_or_err__ = \
+    override gmEmptyOrErr = \
         test -z '$(shell $2)' || ( \
-            $(call __err__,$1) \
+            $(call gmErr,$1) \
             && exit 1 \
         )
 endif
 
 .PHONY: confirm
 confirm:
-	@ $(call __choice_or_err__,Are you sure?,y,N,The choice is not confirmed. Abort!)
+	@ $(call gmChoiceOrErr,Are you sure?,y,N,The choice is not confirmed. Abort!)
 
 .PHONY: git/no-dirty
 git/no-dirty:
-	@ $(call __empty_or_err__,There are untracked/unstaged/uncommitted changes!,\
+	@ $(call gmEmptyOrErr,There are untracked/unstaged/uncommitted changes!,\
         git status --porcelain \
     )
 
 .PHONY: create/binary_dir
 create/binary_dir:
-ifeq ($(__OS__),Windows)
+ifeq ($(gmOS),Windows)
 	@ [void](New-Item "$(BINARY_DIR)" -ItemType Directory -Force)
 else
 	@ mkdir -p "$(BINARY_DIR)"
@@ -353,7 +353,7 @@ endif
 ## mod/download: download modules to local cache
 .PHONY: mod/download
 mod/download:
-	@ $(call __run_with_logging__,Downloading modules to local cache,\
+	@ $(call gmRun,Downloading modules to local cache,\
         go mod download -x \
     )
 
@@ -361,31 +361,31 @@ mod/download:
 ##              : the `go.mod` and `go.sum` files
 .PHONY: mod/tidy-diff
 mod/tidy-diff:
-	@ $(call __run_with_logging__,Checking missing and unused modules,\
+	@ $(call gmRun,Checking missing and unused modules,\
         go mod tidy -diff \
     )
 
 ## mod/tidy: add missing and remove unused modules
 .PHONY: mod/tidy
 mod/tidy:
-	@ $(call __run_with_logging__,Adding missing and remove unused modules,\
+	@ $(call gmRun,Adding missing and remove unused modules,\
         go mod tidy -v \
     )
 
 ## clean: remove files from the binary directory
 .PHONY: clean
 clean:
-	@ $(call __run_with_logging__,Cleaning $(BINARY_DIR),\
-        $(call __clean_impl__) \
+	@ $(call gmRun,Cleaning $(BINARY_DIR),\
+        $(call gmCleanImpl) \
     )
 
-ifeq ($(__OS__),Windows)
-    override __clean_impl__ = \
+ifeq ($(gmOS),Windows)
+    override gmCleanImpl = \
         if (Test-Path "$(BINARY_DIR)" -PathType Container) { \
             Remove-Item "$(BINARY_DIR)\*" -Recurse -Force \
         }
 else
-    override __clean_impl__ = rm -rf $(BINARY_DIR)/*
+    override gmCleanImpl = rm -rf $(BINARY_DIR)/*
 endif
 
 # ============================================================================ #
@@ -397,34 +397,34 @@ endif
 ## mod/verify: verify that dependencies have expected content
 .PHONY: mod/verify
 mod/verify:
-	@ $(call __run_with_logging__,Verifying dependencies,\
+	@ $(call gmRun,Verifying dependencies,\
         go mod verify \
     )
 
 ## fmt/no-dirty: check package sources whose formatting differs from gofmt
 .PHONY: fmt/no-dirty
 fmt/no-dirty:
-	@ $(call __empty_or_err__,Package sources is unformatted,\
+	@ $(call gmEmptyOrErr,Package sources is unformatted,\
         gofmt -d . \
     )
 
 ## fmt: gofmt (reformat) package sources
 .PHONY: fmt
 fmt:
-	@ $(call __run_with_logging__,Reformatting package sources,\
+	@ $(call gmRun,Reformatting package sources,\
         go fmt ./... \
     )
 
 ## vet: report likely mistakes in packages
 .PHONY: vet
 vet:
-	@ $(call __run_with_logging__,Running go vet,\
+	@ $(call gmRun,Running go vet,\
         go vet ./... \
     )
 
 ## golangci-lint: a fast linters runner for Go
 .PHONY: golangci-lint
 golangci-lint:
-	@ $(call __run_with_logging__,Running golangci-lint,\
+	@ $(call gmRun,Running golangci-lint,\
         golangci-lint run ./... \
     )
