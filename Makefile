@@ -48,6 +48,18 @@
 #
 #   git subtree --squash -P scripts/make pull git@github.com:tsayukov/golang-multi-platform-makefile.git main
 #
+#                                  STYLE GUIDE
+#                          (Recommendations, not rules)
+#
+# All internal variables and function-like variables are named in camelCase
+# starting with the 'gm' prefix that stands for 'Go Makefile'. These variables
+# are defined using the override directive and are not intended to change.
+#
+# Variables that imply changes are named in UPPERCASE_WITH_UNDERSCORES.
+#
+# Targets are named in lowercase. The words can be separated by slash or hyphen.
+# You can use a slash to group similar targets and use a hyphen instead of a space.
+#
 #                    HOW TO WRITE DOCUMENTATION FOR TARGETS
 #
 # Every comment line that starts with two '#' is parsed by the 'help' target
