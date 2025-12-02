@@ -218,6 +218,11 @@
 #
     override gmSpaceSepToCommaSepList = $(subst $(gmSpace),$(gmComma),$(strip $1))
 #
+# 5. Auxiliary function-like variables:
+#
+# Reverse space-separated words (https://stackoverflow.com/a/786530/10537247).
+    override gmReverse = $(if $1,$(call gmReverse,$(wordlist 2,$(words $1),$1))) $(firstword $1)
+#
 # ============================================================================ #
 
 # The blank line below is necessary to get the same help message on different
