@@ -240,7 +240,7 @@ ifeq ($(gmOS),Windows)
     # Hack: replace two '#' with the NULL character to force ConvertFrom-Csv
     # to print empty lines.
 	@ Write-Host "Targets:" -NoNewline; <#\
- #> (Get-Content $(call gmSpaceSepToCommaSepList,$(MAKEFILE_LIST))) <#\
+ #> (Get-Content $(call gmSpaceSepToCommaSepList,$(call gmReverse,$(MAKEFILE_LIST)))) <#\
  #>     -match "^##" -replace "^##","$$([char]0x0)" <#\
  #> | ConvertFrom-Csv -Delimiter ":" -Header Target,Description <#\
  #> | Format-Table <#\
@@ -248,7 +248,7 @@ ifeq ($(gmOS),Windows)
  #>     -Property @{Expression=" "},Target,@{Expression=" "},Description
 else
 	@ echo 'Targets:' \
-	&& sed --quiet 's/^##//p' $(MAKEFILE_LIST) \
+	&& sed --quiet 's/^##//p' $(call gmReverse,$(MAKEFILE_LIST)) \
 	| sed --expression='s/[ \t]*:[ \t]*/:/' \
     | column --table --separator ':' \
     | sed --expression='s/^/ /' \
