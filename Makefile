@@ -348,6 +348,18 @@ git/no-dirty:
         git status --porcelain \
     )
 
+.PHONY: git/no-staged
+git/no-staged:
+	@ $(call gmEmptyOrErr,There are staged changes!,\
+		$(call gmGitNoStagedImpl) \
+    )
+
+ifeq ($(gmOS),Windows)
+    override gmGitNoStagedImpl = if ((git status --porcelain | Out-String) -match "^(M|A).* ") { "no empty" } else { "" }
+else
+    override gmGitNoStagedImpl = git status --porcelain | grep -E "^(M|A).* "
+endif
+
 .PHONY: create/binary_dir
 create/binary_dir:
 ifeq ($(gmOS),Windows)
