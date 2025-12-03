@@ -394,10 +394,10 @@ mod/tidy-diff:
         go mod tidy -diff \
     )
 
-## mod/tidy: add missing and remove unused modules
+## mod/tidy: add missing modules and remove unused modules
 .PHONY: mod/tidy
 mod/tidy:
-	@ $(call gmRun,Adding missing and remove unused modules,\
+	@ $(call gmRun,Adding missing modules and removing unused modules,\
         go mod tidy -v \
     )
 
