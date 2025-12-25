@@ -149,10 +149,17 @@
 #
 #                                     TIPS
 #
-# 1. To split a PowerShell command line over multiple lines use a comment block
-# with a backslash inside:
-#   do things <#\
+# 1. To split a PowerShell command line over multiple lines in a recipe
+# use a comment block with a backslash inside:
+#   @ do things <#\
 #   #> do other things
+#
+# You can also wrap a command by the gmRun call (see below in "Logging")
+# and split it by a backslash.
+#   @ $(call gmRun,Do things and other things,\
+#       do things \
+#       do other things \
+#   )
 #
 # 2. Colorful output:
 #   .PHONY: target
@@ -207,26 +214,23 @@
 	        fi
     endif
 #
-# 4. There are convenient definitions of the comma and space variables:
+# 4. Auxiliary function-like variables:
 #
+# There are convenient definitions of the comma and space variables:
     override gmComma := ,
     override gmEmpty :=
     override gmSpace := $(gmEmpty) $(gmEmpty)
-#
 # They can be used to replace space-separated words with comma-separated words,
 # i.e., to pass them into a PowerShell command:
-#
     override gmSpaceSepToCommaSepList = $(subst $(gmSpace),$(gmComma),$(strip $1))
-#
-# 5. Auxiliary function-like variables:
 #
 # Reverse space-separated words (https://stackoverflow.com/a/786530/10537247).
     override gmReverse = $(if $1,$(call gmReverse,$(wordlist 2,$(words $1),$1))) $(firstword $1)
 #
 # ============================================================================ #
 
-# The blank line below is necessary to get the same help message on different
-# operating systems.
+# NOTE: the blank line below is necessary to get the same help message
+# on different operating systems.
 ##:
 ## help: print this help message and exit
 .PHONY: help
