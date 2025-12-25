@@ -316,6 +316,15 @@ override gmVariables += GOOS
 export GOARCH ?= $(shell go env GOARCH)
 override gmVariables += GOARCH
 
+## AUDIT_RULES: get a list of targets each of which is invoked for the audit
+##            : target
+AUDIT_RULES := \
+    mod/tidy-diff \
+    mod/verify \
+    fmt/no-dirty \
+    golangci-lint
+override gmVariables += AUDIT_RULES
+
 $(call gmMakeVariableGetters)
 
 # ============================================================================ #
@@ -439,6 +448,10 @@ endif
 ##:                              Quality control
 ##:
 # ============================================================================ #
+
+## audit: run quality control checks (see the AUDIT_RULES variable)
+.PHONY: audit
+audit: $(AUDIT_RULES) ;
 
 ## mod/verify: verify that dependencies have expected content
 .PHONY: mod/verify
