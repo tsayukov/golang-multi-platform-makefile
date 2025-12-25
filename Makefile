@@ -30,7 +30,7 @@
 #
 #                                  HOW TO USE
 #
-# The simplest way is to copying the Makefile into your project and to modify it
+# The simplest way is to copy the Makefile into your project and to modify it
 # according to your needs.
 #
 # The more extensible way is to create a subtree by importing its content from
