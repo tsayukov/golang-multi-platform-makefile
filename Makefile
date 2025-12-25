@@ -360,18 +360,18 @@ else
         )
 endif
 
-.PHONY: confirm
-confirm:
+.PHONY: gm/confirm
+gm/confirm:
 	@ $(call gmChoiceOrErr,Are you sure?,y,N,The choice is not confirmed. Abort!)
 
-.PHONY: git/no-dirty
-git/no-dirty:
+.PHONY: gm/git/no-dirty
+gm/git/no-dirty:
 	@ $(call gmEmptyOrErr,There are untracked/unstaged/uncommitted changes!,\
         git status --porcelain \
     )
 
-.PHONY: git/no-staged
-git/no-staged:
+.PHONY: gm/git/no-staged
+gm/git/no-staged:
 	@ $(call gmEmptyOrErr,There are staged changes!,\
 		$(call gmGitNoStagedImpl) \
     )
@@ -382,8 +382,8 @@ else
     override gmGitNoStagedImpl = git status --porcelain | grep -E "^(M|A).* "
 endif
 
-.PHONY: create/binary_dir
-create/binary_dir:
+.PHONY: gm/create/binary_dir
+gm/create/binary_dir:
 ifeq ($(gmOS),Windows)
 	@ [void](New-Item "$(BINARY_DIR)" -ItemType Directory -Force)
 else
