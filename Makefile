@@ -311,7 +311,7 @@ override gmVariables += GOBIN
 export GOOS ?= $(shell go env GOOS)
 override gmVariables += GOOS
 
-## GOARCH: get the target's architecture
+## GOARCH: get the target's architecture;
 ##       : GOARCH will be exported to child processes
 export GOARCH ?= $(shell go env GOARCH)
 override gmVariables += GOARCH
