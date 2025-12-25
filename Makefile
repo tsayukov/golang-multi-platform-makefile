@@ -267,13 +267,29 @@ endif
 # or by passing them into the `make` call:
 #   make <variable_1>=<value_1> <variable_2>=<value_2> [...]
 #
-# To generate a target that prints the value of a variable by default,
-# use the list below and append it with the variable name:
+# To generate a target that prints the value of a variable,
+# as gmVariableGetterRule does by default, use the list below and append
+# it with the variable name:
 #   override gmVariables += <variable name>
     override gmVariables :=
-#
-# If necessary, change the template below.
-override define gmMakeVariableGetter
+# When you are done to define your variables call gmMakeVariableGetters
+# to generate the rules:
+#   $(call gmMakeVariableGetters)
+override define gmMakeVariableGetters
+    $(foreach var,$(gmVariables), \
+        $(eval \
+            $(call gmVariableGetterRule,$(var)) \
+        ) \
+    ); $(eval $(call gmVariablesClear))
+endef
+# It also cleans the last gmVariables list, so you can define other variables
+# separately and do the target generation again.
+override define gmVariablesClear
+    override gmVariables :=
+endef
+# If you want a different behavior for your variables, just copy the definition
+# below, paste before the gmMakeVariableGetters call, and change the recipe.
+override define gmVariableGetterRule
 .PHONY: $1
 $1:
 	@ echo "$($1)"
@@ -300,12 +316,7 @@ override gmVariables += GOOS
 export GOARCH ?= $(shell go env GOARCH)
 override gmVariables += GOARCH
 
-# Generate variable getters for all the variables in the last gmVariables.
-$(foreach var,$(gmVariables), \
-    $(eval \
-        $(call gmMakeVariableGetter,$(var)) \
-    ) \
-)
+$(call gmMakeVariableGetters)
 
 # ============================================================================ #
 #                                    Helpers
