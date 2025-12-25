@@ -290,13 +290,15 @@ export GOBIN ?= $(gmProjectRoot)$(BINARY_DIR)
 export PATH  := $(GOBIN)$(gmListSep)$(PATH)
 override gmVariables += GOBIN
 
-## TARGET_OS: get the target's operation system
-TARGET_OS := linux
-override gmVariables += TARGET_OS
+## GOOS: get the target's operation system;
+##     : GOOS will be exported to child processes
+export GOOS ?= $(shell go env GOOS)
+override gmVariables += GOOS
 
-## TARGET_ARCH: get the target's architecture
-TARGET_ARCH := amd64
-override gmVariables += TARGET_ARCH
+## GOARCH: get the target's architecture
+##       : GOARCH will be exported to child processes
+export GOARCH ?= $(shell go env GOARCH)
+override gmVariables += GOARCH
 
 # Generate variable getters for all the variables in the last gmVariables.
 $(foreach var,$(gmVariables), \
