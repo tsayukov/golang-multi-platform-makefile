@@ -457,7 +457,8 @@ endif
 ##:
 # ============================================================================ #
 
-## audit: run quality control checks (see the AUDIT_RULES variable)
+## audit: run quality control checks
+##      : (see the AUDIT_RULES variable to learn what targets will be called)
 .PHONY: audit
 audit: $(AUDIT_RULES) ;
 
