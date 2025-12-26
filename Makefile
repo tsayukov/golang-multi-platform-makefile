@@ -227,6 +227,14 @@
 # Reverse space-separated words (https://stackoverflow.com/a/786530/10537247).
     override gmReverse = $(if $1,$(call gmReverse,$(wordlist 2,$(words $1),$1))) $(firstword $1)
 #
+# Set an environment variable in the "key=value" format. E.g.:
+#   $(call gmEnv,CGO_ENABLED=0) go env CGO_ENABLED
+# will print 0.
+    ifeq ($(gmOS),Windows)
+        override gmEnv = $$env:$1; #
+    else
+        override gmEnv = $1 #
+    endif
 # ============================================================================ #
 
 # NOTE: the blank line below is necessary to get the same help message
