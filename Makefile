@@ -333,6 +333,12 @@ AUDIT_RULES := \
     golangci-lint
 override gmVariables += AUDIT_RULES
 
+## TEST_ARGS: get a list of build/test flags using for the `go test` command
+TEST_ARGS := \
+    -v \
+    -race
+override gmVariables += TEST_ARGS
+
 $(call gmMakeVariableGetters)
 
 # ============================================================================ #
@@ -461,6 +467,15 @@ endif
 ##      : (see the AUDIT_RULES variable to learn what targets will be called)
 .PHONY: audit
 audit: $(AUDIT_RULES) ;
+
+## test: run all tests
+##     : (see the TEST_ARGS variable to learn what flags will be applied)
+.PHONY: test
+test:
+	@ $(call gmRun,Running all tests,\
+        $(call gmEnv,CGO_ENABLED=1) \
+        go test $(TEST_ARGS) ./... \
+    )
 
 ## mod/verify: verify that dependencies have expected content
 .PHONY: mod/verify
