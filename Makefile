@@ -477,6 +477,15 @@ test:
         go test $(TEST_ARGS) ./... \
     )
 
+## test/cover: run all tests and display coverage (see the test target)
+.PHONY: test/cover
+test/cover: gm/create/binary_dir
+	@ $(call gmRun,Running all tests with coverage,\
+        $(call gmEnv,CGO_ENABLED=1) \
+        go test $(TEST_ARGS) -coverprofile=$(BINARY_DIR)/coverage.out ./... \
+        && go tool cover -html=$(BINARY_DIR)/coverage.out \
+    )
+
 ## mod/verify: verify that dependencies have expected content
 .PHONY: mod/verify
 mod/verify:
