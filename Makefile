@@ -324,6 +324,17 @@ override gmVariables += GOOS
 export GOARCH ?= $(shell go env GOARCH)
 override gmVariables += GOARCH
 
+## PACKAGE_PATHS: get a list of paths of packages to build;
+##              : they may be relative to the current directory
+##              : (e.g., "." or "cmd/tool")
+PACKAGE_PATHS := .
+override gmVariables += PACKAGE_PATHS
+
+## BUILD_ARGS: get a list of build flags using for the `go build` command
+BUILD_ARGS := \
+    -trimpath
+override gmVariables += BUILD_ARGS
+
 ## AUDIT_RULES: get a list of targets each of which is invoked for the audit
 ##            : target
 AUDIT_RULES := \
@@ -418,6 +429,21 @@ endif
 ##:                                   Build
 ##:
 # ============================================================================ #
+
+## build: build all packages (see the PACKAGE_PATHS variable)
+.PHONY: build
+build: gm/create/binary_dir
+	@ $(foreach packagePath,$(PACKAGE_PATHS), \
+        $(let package,$(notdir $(packagePath)), \
+            $(call gmRun,Building $(package), \
+                $(call gmEnv,CGO_ENABLED=0) \
+                go build \
+                    $(BUILD_ARGS) \
+                    -o=$(BINARY_DIR)/$(package) \
+                    $(package) \
+            ) \
+        ) \
+    )
 
 ## mod/download: download modules to local cache
 .PHONY: mod/download
