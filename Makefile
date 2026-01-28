@@ -300,7 +300,7 @@ endef
 override define gmVariableGetterRule
 .PHONY: $1
 $1:
-	@ echo "$($1)"
+	@ echo "$$($1)"
 endef
 # ============================================================================ #
 
