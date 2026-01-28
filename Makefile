@@ -503,7 +503,7 @@ audit: $(AUDIT_RULES) ;
 .PHONY: test
 test:
 	@ $(call gmRun,Running all tests,\
-        $(call gmEnv,CGO_ENABLED=1) \
+        $(if $(firstword $(filter -race,$(TEST_ARGS))),$(call gmEnv,CGO_ENABLED=1)) \
         go test $(TEST_ARGS) ./... \
     )
 
@@ -511,7 +511,7 @@ test:
 .PHONY: test/cover
 test/cover: gm/create/binary_dir
 	@ $(call gmRun,Running all tests with coverage,\
-        $(call gmEnv,CGO_ENABLED=1) \
+        $(if $(firstword $(filter -race,$(TEST_ARGS))),$(call gmEnv,CGO_ENABLED=1)) \
         go test $(TEST_ARGS) -coverprofile=$(BINARY_DIR)/coverage.out ./... \
         && go tool cover -html=$(BINARY_DIR)/coverage.out \
     )
