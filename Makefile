@@ -335,6 +335,12 @@ BUILD_ARGS := \
     -trimpath
 override gmVariables += BUILD_ARGS
 
+## TEST_ARGS: get a list of build/test flags using for the `go test` command
+TEST_ARGS := \
+    -v \
+    -race
+override gmVariables += TEST_ARGS
+
 ## AUDIT_RULES: get a list of targets each of which is invoked for the audit
 ##            : target
 AUDIT_RULES := \
@@ -343,12 +349,6 @@ AUDIT_RULES := \
     fmt/no-dirty \
     golangci-lint
 override gmVariables += AUDIT_RULES
-
-## TEST_ARGS: get a list of build/test flags using for the `go test` command
-TEST_ARGS := \
-    -v \
-    -race
-override gmVariables += TEST_ARGS
 
 $(call gmMakeVariableGetters)
 
