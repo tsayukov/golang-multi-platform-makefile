@@ -271,9 +271,13 @@ endif
 ##:
 ##:                                 Variables
 ##:
-# These variables can be changed here directly by editing this file
-# or by passing them into the `make` call:
-#   make <variable_1>=<value_1> <variable_2>=<value_2> [...]
+# These variables can be changed:
+#  - by editing this file (not encouraged);
+#  - by overriding them in the top-level Makefile that includes this file
+#    (recommended):
+#    VAR := your value
+#  - by passing them into the `make` call:
+#    make <variable_1>=<value_1> <variable_2>=<value_2> [...]
 #
 # To generate a target that prints the value of a variable,
 # as gmVariableGetterRule does by default, use the list below and append
