@@ -512,8 +512,8 @@ test:
 test/cover: gm/create/binary_dir
 	@ $(call gmRun,Running all tests with coverage,\
         $(if $(firstword $(filter -race,$(TEST_ARGS))),$(call gmEnv,CGO_ENABLED=1)) \
-        go test $(TEST_ARGS) -coverprofile=$(BINARY_DIR)/coverage.out ./... \
-        && go tool cover -html=$(BINARY_DIR)/coverage.out \
+        go test $(TEST_ARGS) -coverprofile="$(BINARY_DIR)/coverage.out" ./... \
+        && go tool cover -html="$(BINARY_DIR)/coverage.out" \
     )
 
 ## mod/verify: verify that dependencies have expected content
