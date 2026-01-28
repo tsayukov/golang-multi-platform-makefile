@@ -507,14 +507,44 @@ test:
         go test $(TEST_ARGS) ./... \
     )
 
-## test/cover: run all tests and display coverage (see the test target)
+## test/cover: run all tests with coverage (see the test target)
 .PHONY: test/cover
 test/cover: gm/create/binary_dir
 	@ $(call gmRun,Running all tests with coverage,\
         $(if $(firstword $(filter -race,$(TEST_ARGS))),$(call gmEnv,CGO_ENABLED=1)) \
         go test $(TEST_ARGS) -coverprofile="$(BINARY_DIR)/coverage.out" ./... \
-        && go tool cover -html="$(BINARY_DIR)/coverage.out" \
     )
+
+## test/cover/html: display coverage in a browser
+.PHONY: test/cover/html
+test/cover/html: test/cover
+	@ go tool cover -html="$(BINARY_DIR)/coverage.out"
+
+## test/cover/total-as-json: record the total coverage in ".coverage.json"
+##                         : as the value of the "total" key
+##                         : (it can be used by a dynamic JSON badge)
+.PHONY: test/cover/total-as-json
+test/cover/total-as-json: test/cover
+	@ $(call gmRun,Recording total coverage to .coverage.json,\
+        $(call gmTestCoverTotalAsJSONImpl) \
+    )
+
+ifeq ($(gmOS),Windows)
+    override gmTestCoverTotalAsJSONImpl = \
+        $$total = ( \
+            go tool cover -func="bin/coverage.out" \
+            | Select-String '^total:' -Raw \
+            | Select-String '[0-9]+\.[0-9]+' \
+        ).Matches.Value; "{`"total`":$$total}" \
+        | Out-File -Path ".coverage.json" -Encoding utf8 -Force -NoNewline
+else
+    override gmTestCoverTotalAsJSONImpl = \
+        total=$$(\
+            go tool cover -func="$(BINARY_DIR)/coverage.out" \
+            | grep -E '^total' \
+            | grep -Eo '[0-9]+\.[0-9]+' \
+        ); echo -n "{\"total\":$$total}" > .coverage.json
+endif
 
 ## mod/verify: verify that dependencies have expected content
 .PHONY: mod/verify
