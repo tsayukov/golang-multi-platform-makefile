@@ -522,30 +522,60 @@ test/cover: gm/create/binary_dir
 test/cover/html: test/cover
 	@ go tool cover -html="$(BINARY_DIR)/coverage.out"
 
-## test/cover/total-as-json: record the total coverage in ".coverage.json"
-##                         : as the value of the "total" key
-##                         : (it can be used by a dynamic JSON badge)
-.PHONY: test/cover/total-as-json
-test/cover/total-as-json: test/cover
-	@ $(call gmRun,Recording total coverage to .coverage.json,\
-        $(call gmTestCoverTotalAsJSONImpl) \
+## test/cover/endpoint-badge: generate a JSON file for Endpoint Badge;
+##                          : file io.shields.badges.endpoint.json;
+##                          : see shields.io/badges/endpoint-badge
+.PHONY: test/cover/endpoint-badge
+test/cover/endpoint-badge: test/cover
+	@ $(call gmRun,Generating $(gmTestCoverEndpointBadgeJSON),\
+        $(call gmTestCoverEndpointBadgeImpl) \
     )
 
+override gmTestCoverEndpointBadgeJSON := io.shields.badges.endpoint.json
+override gmTestCoverEndpointBadgeMinColorRange := 50
+override gmTestCoverEndpointBadgeMaxColorRange := 95
+
 ifeq ($(gmOS),Windows)
-    override gmTestCoverTotalAsJSONImpl = \
+    override gmTestCoverEndpointBadgeImpl = \
         $$total = ( \
-            go tool cover -func="bin/coverage.out" \
+            go tool cover -func="$(BINARY_DIR)/coverage.out" \
             | Select-String '^total:' -Raw \
             | Select-String '[0-9]+\.[0-9]+' \
-        ).Matches.Value; "{`"total`":$$total}" \
-        | Out-File -Path ".coverage.json" -Encoding utf8 -Force -NoNewline
+        ).Matches.Value; \
+        $$min = [double]::Parse( \
+            "$(gmTestCoverEndpointBadgeMinColorRange)", \
+            [cultureinfo]::InvariantCulture); \
+        $$max = [double]::Parse( \
+            "$(gmTestCoverEndpointBadgeMaxColorRange)", \
+            [cultureinfo]::InvariantCulture); \
+        $$val = [math]::Clamp( \
+            [double]::Parse($$total, [cultureinfo]::InvariantCulture), \
+            $$min, $$max); \
+        $$hue = [math]::Floor((($$val - $$min) / ($$max - $$min)) * 120); \
+        "{`"schemaVersion`":1,`"label`":`"Coverage`",`"message`":`"$$total%`",`"color`":`"hsl($$hue,100%,40%)`"}" \
+        | Out-File -Path $(gmTestCoverEndpointBadgeJSON) -Encoding utf8 -Force -NoNewline
 else
-    override gmTestCoverTotalAsJSONImpl = \
+    override gmTestCoverEndpointBadgeImpl = \
         total=$$(\
             go tool cover -func="$(BINARY_DIR)/coverage.out" \
             | grep -E '^total' \
             | grep -Eo '[0-9]+\.[0-9]+' \
-        ); echo -n "{\"total\":$$total}" > .coverage.json
+        ); \
+        min=$(gmTestCoverEndpointBadgeMinColorRange); \
+        max=$(gmTestCoverEndpointBadgeMaxColorRange); \
+        hue=$$(\
+           echo "\
+           scale = 2; \
+           val = $$total; \
+           if (val < $$min) val = $$min; \
+           if (val > $$max) val = $$max; \
+           hue = ((val - $$min) / ($$max - $$min)) * 120; \
+           scale = 0; hue / 1 \
+           " | bc -l \
+        ); \
+        echo -n \
+        "{\"schemaVersion\":1,\"label\":\"Coverage\",\"message\":\"$$total%\",\"color\":\"hsl($$hue,100%,40%)\"}" \
+        > $(gmTestCoverEndpointBadgeJSON)
 endif
 
 ## mod/verify: verify that dependencies have expected content
