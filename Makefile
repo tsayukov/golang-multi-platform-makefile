@@ -48,6 +48,8 @@
 #
 #   git subtree --squash -P scripts/make pull git@github.com:tsayukov/golang-multi-platform-makefile.git main
 #
+# After the deed is done, type the command `make help` or just `make`.
+#
 #                                  STYLE GUIDE
 #                          (Recommendations, not rules)
 #
