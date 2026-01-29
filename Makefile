@@ -531,7 +531,7 @@ test/cover/endpoint-badge: test/cover
         $(call gmTestCoverEndpointBadgeImpl) \
     )
 
-override gmTestCoverEndpointBadgeJSON := io.shields.badges.endpoint.json
+override gmTestCoverEndpointBadgeJSON := io.shields.badges.endpoint.coverage.json
 override gmTestCoverEndpointBadgeMinColorRange := 50
 override gmTestCoverEndpointBadgeMaxColorRange := 95
 
