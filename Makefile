@@ -218,7 +218,7 @@
 #
 # 4. Auxiliary function-like variables:
 #
-# There are convenient definitions of the comma and space variables:
+# 4.1. There are convenient definitions of the comma and space variables:
     override gmComma := ,
     override gmEmpty :=
     override gmSpace := $(gmEmpty) $(gmEmpty)
@@ -226,10 +226,10 @@
 # i.e., to pass them into a PowerShell command:
     override gmSpaceSepToCommaSepList = $(subst $(gmSpace),$(gmComma),$(strip $1))
 #
-# Reverse space-separated words (https://stackoverflow.com/a/786530/10537247).
+# 4.2. Reverse space-separated words (https://stackoverflow.com/a/786530/10537247).
     override gmReverse = $(if $1,$(call gmReverse,$(wordlist 2,$(words $1),$1))) $(firstword $1)
 #
-# Set an environment variable in the "key=value" format. E.g.:
+# 4.3. Set an environment variable in the "key=value" format. E.g.:
 #   $(call gmEnv,CGO_ENABLED=0) go env CGO_ENABLED
 # will print 0.
     ifeq ($(gmOS),Windows)
