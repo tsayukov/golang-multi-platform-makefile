@@ -1,6 +1,6 @@
 # This file is licensed under the terms of the MIT License
 #
-# Copyright (c) 2025 Pavel Tsayukov p.tsayukov@gmail.com
+# Copyright (c) 2026 Pavel Tsayukov p.tsayukov@gmail.com
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
